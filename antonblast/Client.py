@@ -219,6 +219,10 @@ class AntonblastContext(CommonContext):
     msgs.append('CONFIG|time_trial_mult=' + str(int(slot_data.get('time_trial_mult', 150))))
     msgs.append('CONFIG|cracked=' + ('1' if slot_data.get('include_cracked', False) else '0'))
     msgs.append('CONFIG|deathlink=' + ('1' if slot_data.get('death_link', False) else '0'))
+    from worlds.antonblast.Locations import OPTION_KEY_TO_STAGE, STAGES
+    _display_to_key = {disp: key for disp, key in STAGES}
+    _start_display = OPTION_KEY_TO_STAGE.get(slot_data.get('starting_stage', 'boiler_city'), 'Boiler City')
+    msgs.append('CONFIG|starting_stage=' + _display_to_key.get(_start_display, 'boilerCity'))
     slot_name = self.player_names.get(self.slot, '') if self.slot else ''
     seed_name = getattr(self, 'seed_name', '') or ''
     msgs.append('SESSION|' + slot_name + '|' + seed_name + '|' + str(self._get_real_port()))
