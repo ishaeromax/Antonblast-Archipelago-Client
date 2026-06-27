@@ -47,6 +47,7 @@ def _set_completion_all(multiworld: MultiWorld, player: int, options) -> None:
   from .Locations import ALL_STAGE_REGIONS, ALL_BOSS_REGIONS, ALL_EX_REGIONS, ALL_LIME_REGIONS
 
   required = []
+
   required += [f'Clear: {s}' for s in ALL_STAGE_REGIONS]
   required += [f'Clear: {b}' for b in ALL_BOSS_REGIONS]
 
@@ -61,6 +62,7 @@ def _set_completion_all(multiworld: MultiWorld, player: int, options) -> None:
 
   multiworld.completion_condition[player] = lambda state: all(
     state.can_reach_location(loc, player)
+    
     for loc in required
     if multiworld.get_location(loc, player) is not None
   )

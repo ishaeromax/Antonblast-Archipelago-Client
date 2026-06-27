@@ -4,11 +4,13 @@ from .Locations import (AntonLocation, location_table, ALL_STAGE_REGIONS, ALL_BO
 def _make_region(name: str, player: int, multiworld: MultiWorld) -> Region:
   region = Region(name, player, multiworld)
   multiworld.regions.append(region)
+  
   return region
 
 def _populate_region(region: Region, player: int, active_loc_names: set, filter_region: str) -> None:
   locs = {
     name: data.code
+
     for name, data in location_table.items()
     if data.region == filter_region and name in active_loc_names
   }
@@ -23,16 +25,14 @@ def create_regions(multiworld: MultiWorld, player: int, options) -> None:
   include_shop = bool(options.include_shop_items)
   include_time_trials = bool(options.include_time_trials)
   include_cracked = bool(options.include_cracked)
+
   starting_stage = OPTION_KEY_TO_STAGE.get(options.starting_stage.current_key, 'Boiler City')
 
   active = _build_active_set(dual_char, include_ex, include_lime, include_shop, include_time_trials, include_cracked)
 
   menu = _make_region('Menu', player, multiworld)
 
-  all_regions = (
-    ALL_STAGE_REGIONS + ALL_BOSS_REGIONS + ALL_EX_REGIONS + ALL_LIME_REGIONS
-    + ['Shop', 'Satan']
-  )
+  all_regions = (ALL_STAGE_REGIONS + ALL_BOSS_REGIONS + ALL_EX_REGIONS + ALL_LIME_REGIONS + ['Shop', 'Satan'])
 
   region_map: dict[str, Region] = {}
   for rname in all_regions:
@@ -58,21 +58,30 @@ def _build_active_set(dual_char: bool, include_ex: bool, include_lime: bool, inc
     is_annie = name.startswith('Annie - ')
     if is_annie and not dual_char:
       continue
+
     if not include_ex and data.region in ALL_EX_REGIONS:
       continue
+
     if not include_ex and is_annie and any(data.region == f'Annie - {r}' for r in ALL_EX_REGIONS):
       continue
+
     if not include_lime and data.region in ALL_LIME_REGIONS:
       continue
+
     if not include_lime and is_annie and any(data.region == f'Annie - {r}' for r in ALL_LIME_REGIONS):
       continue
+
     if not include_shop and data.region == 'Shop':
       continue
+
     if not include_time_trials and data.code in _par_codes:
       continue
+
     if not include_cracked and data.code in _cracked_codes:
       continue
+
     active.add(name)
+    
   return active
 
 def _connect_regions(menu: Region, region_map: dict, stage_unlock: bool, dual_char: bool, starting_stage: str, player: int, include_ex: bool, include_lime: bool, include_shop: bool, all_regions: list) -> None:
@@ -80,10 +89,13 @@ def _connect_regions(menu: Region, region_map: dict, stage_unlock: bool, dual_ch
   for rname in all_regions:
     if rname == 'Shop' and not include_shop:
       continue
+
     if rname in ALL_EX_REGIONS and not include_ex:
       continue
+
     if rname in ALL_LIME_REGIONS and not include_lime:
       continue
+
     if rname not in region_map:
       continue
 
@@ -94,11 +106,13 @@ def _connect_regions(menu: Region, region_map: dict, stage_unlock: bool, dual_ch
 
     if dual_char:
       annie_rname = f'Annie - {rname}'
+
       if annie_rname in region_map:
         _connect_one(menu, region_map[annie_rname], annie_rname, needs_key, key_item, player)
 
 def _connect_one(menu: Region, target: Region, label: str, needs_key: bool, key_item, player: int) -> None:
   entrance = menu.create_exit(f'Enter {label}')
   entrance.connect(target)
+
   if needs_key and key_item:
     entrance.access_rule = lambda state, k=key_item: state.has(k, player)
